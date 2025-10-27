@@ -1,8 +1,8 @@
 
 # 🤖 AI Mock Interviewer
 
-A lightweight **AI-powered mock interviewer** built using **CrewAI** and **OpenAI**.
-It conducts a **technical interview** and provides **feedback** for each response.
+A lightweight **AI-powered mock interviewer** built using **CrewAI**, **OpenAI**, and **Streamlit**.
+It conducts a **technical interview**, provides **feedback for each response**, and displays everything in a **clean, user-friendly web interface**.
 
 ---
 
@@ -10,7 +10,9 @@ It conducts a **technical interview** and provides **feedback** for each respons
 
 * 💬 Conducts mock interviews using OpenAI’s GPT model
 * 🧠 Uses CrewAI for intelligent agent orchestration
-* 🗣️ Asks technical questions and provides instant feedback
+* 🖥️ Interactive **Streamlit web UI** for easy use
+* 📜 Clean **Markdown-formatted transcript** with questions, answers, and feedback
+* 💾 Option to **download interview transcript** after completion
 
 ---
 
@@ -31,7 +33,7 @@ It conducts a **technical interview** and provides **feedback** for each respons
 3. Run the app
 
    ```bash
-   python main.py
+   streamlit run main.py
    ```
 
 ---
@@ -39,14 +41,12 @@ It conducts a **technical interview** and provides **feedback** for each respons
 ## 🧩 Core Functionality
 
 * Initializes a **CrewAI agent** as an interviewer
-* Uses **OpenAI GPT model** to generate and evaluate questions
-* Runs an automated **mock interview session** and outputs responses
+* Uses **OpenAI GPT model** to generate and evaluate interview content
+* Displays a **beautifully formatted transcript** via Streamlit
+* Allows **real-time streaming** and **easy transcript download**
 
 ---
 
 ## 📄 License
 
 MIT License
-
----
-
