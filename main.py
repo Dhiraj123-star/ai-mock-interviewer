@@ -39,11 +39,10 @@ total_questions = st.sidebar.number_input("🧩 Number of Questions:", min_value
 # 🧩 Generate question dynamically
 def generate_question(topic, exp_level, difficulty, prev_qs):
     prompt = (
-        f"You are an expert interviewer conducting a {difficulty.lower()}-level mock interview "
-        f"for a {exp_level.lower()} {topic} developer.\n"
-        f"Previous questions: {prev_qs}\n"
-        f"Ask the next non-repetitive, high-quality interview question.\n"
-        f"Return only the question text."
+        f"You are an expert interviewer conducting a {difficulty.lower()} interview "
+        f"for a {exp_level.lower()} candidate on {topic}.\n"
+        f"Previous questions asked: {prev_qs}\n"
+        f"Ask the next question.\nReturn only the question text without explanation."
     )
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -51,32 +50,50 @@ def generate_question(topic, exp_level, difficulty, prev_qs):
     )
     return response.choices[0].message.content.strip()
 
-# 🧩 Evaluate candidate answer
+# 🧩 Evaluate answer
 def evaluate_answer(question, answer, exp_level):
     prompt = (
-        f"You are a senior interviewer evaluating a {exp_level.lower()}-level candidate.\n"
-        f"Question: {question}\n"
+        f"You are a senior interviewer assessing a {exp_level.lower()} candidate.\n\n"
+        f"Interview Question: {question}\n"
         f"Candidate Answer: {answer}\n\n"
-        "Provide feedback with:\n"
-        "1️⃣ Accuracy assessment\n"
-        "2️⃣ Strengths in the answer\n"
-        "3️⃣ Areas for improvement\n"
-        "4️⃣ A score out of 10."
+        "Your evaluation should be structured and easy to follow.\n"
+        "Provide the response in this format:\n\n"
+        "### 🧠 Feedback\n"
+        "- What the candidate did well\n"
+        "- What needs improvement\n"
+        "- Score (x/10)\n\n"
+        "### ✅ Correct / Ideal Answer (Explain Simply)\n"
+        "- Provide a clear, concise, and correct answer.\n"
+        "- Rewrite it in beginner-friendly language.\n\n"
+        "### 🌱 Real-Life Analogy\n"
+        "- Explain the concept using a real-world analogy or metaphor.\n"
+        "- Keep the analogy short but effective.\n"
     )
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
     )
     return response.choices[0].message.content.strip()
+
 
 # 🎯 Start Interview
 if st.button("🚀 Start Personalized Interview"):
+    intro_prompt = (
+        f"You are an interviewer about to start a mock interview.\n"
+        f"Topic: {topic}, Candidate Level: {experience_level}, Difficulty: {difficulty}.\n"
+        f"Introduce yourself and explain how the interview will work in 2-3 sentences."
+    )
+    intro_response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": intro_prompt}]
+    )
+    st.markdown(f"### 👋 Introduction\n{intro_response.choices[0].message.content.strip()}")
+    
     st.session_state.current_question = generate_question(topic, experience_level, difficulty, [])
     st.session_state.answer_submitted = False
     st.session_state.interview_over = False
     st.session_state.transcript = ""
     st.session_state.question_count = 1
-    st.info(f"🎙️ Starting a {difficulty}-level {topic} interview for a {experience_level} candidate...")
 
 # 💬 Show question
 if st.session_state.current_question and not st.session_state.interview_over:
@@ -86,35 +103,23 @@ if st.session_state.current_question and not st.session_state.interview_over:
     answer = st.text_area("💬 Your Answer:", key=f"answer_{st.session_state.question_count}")
 
     if st.button("Submit Answer"):
-        if not answer.strip():
-            st.warning("⚠️ Please enter your answer before submitting.")
-        else:
-            with st.spinner("Evaluating your response..."):
-                feedback = evaluate_answer(st.session_state.current_question, answer, experience_level)
+        if answer.strip():
+            feedback = evaluate_answer(st.session_state.current_question, answer, experience_level)
 
-            # Append to transcript
             st.session_state.transcript += (
                 f"Question {st.session_state.question_count}: {st.session_state.current_question}\n\n"
-                f"Candidate Answer:\n{answer}\n\n"
+                f"Answer: {answer}\n\n"
                 f"Feedback:\n{feedback}\n\n---\n\n"
             )
 
-            # Show feedback
-            st.success("✅ Feedback Received!")
-            st.markdown("### 💡 Feedback")
-            st.markdown(feedback)
+            st.markdown("### 🧠 Interviewer Feedback")
+            st.write(feedback)
 
-            # Move to next question or end
             st.session_state.question_count += 1
             if st.session_state.question_count <= total_questions:
-                next_q = generate_question(
-                    topic,
-                    experience_level,
-                    difficulty,
-                    st.session_state.transcript,
+                st.session_state.current_question = generate_question(
+                    topic, experience_level, difficulty, st.session_state.transcript
                 )
-                st.session_state.current_question = next_q
-                st.session_state.answer_submitted = False
             else:
                 st.session_state.interview_over = True
 
