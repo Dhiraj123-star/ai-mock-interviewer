@@ -75,6 +75,24 @@ def evaluate_answer(question, answer, exp_level):
     )
     return response.choices[0].message.content.strip()
 
+# 🆕 Candidate follow-up question handler
+def ask_interviewer(question, topic, exp_level):
+    prompt = (
+        f"You are a friendly, patient senior interviewer.\n"
+        f"The candidate is {exp_level.lower()} level and is interviewing for {topic}.\n"
+        f"They asked a clarification question:\n\n"
+        f"Candidate Question: {question}\n\n"
+        "Please provide a clear, helpful explanation that:\n"
+        "- Is easy to understand\n"
+        "- Avoids complex jargon\n"
+        "- Uses a real-life analogy where relevant\n"
+        "Keep tone friendly and encouraging."
+    )
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return response.choices[0].message.content.strip()
 
 # 🎯 Start Interview
 if st.button("🚀 Start Personalized Interview"):
@@ -90,9 +108,8 @@ if st.button("🚀 Start Personalized Interview"):
     st.markdown(f"### 👋 Introduction\n{intro_response.choices[0].message.content.strip()}")
     
     st.session_state.current_question = generate_question(topic, experience_level, difficulty, [])
-    st.session_state.answer_submitted = False
-    st.session_state.interview_over = False
     st.session_state.transcript = ""
+    st.session_state.interview_over = False
     st.session_state.question_count = 1
 
 # 💬 Show question
@@ -115,13 +132,39 @@ if st.session_state.current_question and not st.session_state.interview_over:
             st.markdown("### 🧠 Interviewer Feedback")
             st.write(feedback)
 
-            st.session_state.question_count += 1
-            if st.session_state.question_count <= total_questions:
-                st.session_state.current_question = generate_question(
-                    topic, experience_level, difficulty, st.session_state.transcript
-                )
-            else:
-                st.session_state.interview_over = True
+            st.session_state.answer_submitted = True
+
+# 🆕 Always visible follow-up question section AFTER feedback
+if st.session_state.answer_submitted and not st.session_state.interview_over:
+    st.markdown("---")
+    st.subheader("❓ Ask the Interviewer a Clarifying Question")
+
+    follow_up = st.text_input("Type your question here:")
+
+    if st.button("Ask Interviewer"):
+        if follow_up.strip():
+            with st.spinner("Interviewer responding..."):
+                interviewer_reply = ask_interviewer(follow_up, topic, experience_level)
+            st.markdown("### 🗨️ Interviewer's Reply")
+            st.write(interviewer_reply)
+
+            st.session_state.transcript += (
+                f"Candidate Follow-up Question:\n{follow_up}\n\n"
+                f"Interviewer Response:\n{interviewer_reply}\n\n---\n\n"
+            )
+        else:
+            st.warning("⚠️ Please enter a question before submitting.")
+
+    if st.button("Next Question ➡️"):
+        st.session_state.answer_submitted = False
+        st.session_state.question_count += 1
+
+        if st.session_state.question_count <= total_questions:
+            st.session_state.current_question = generate_question(
+                topic, experience_level, difficulty, st.session_state.transcript
+            )
+        else:
+            st.session_state.interview_over = True
 
 # 🏁 End of Interview
 if st.session_state.interview_over:
