@@ -105,9 +105,11 @@ def speak_text(text):
         voice="alloy",
         input=text
     )
+    # read  the binary audio content correctly
+    audio_bytes = speech.read()
     audio_path = "feedback_output.mp3"
     with open(audio_path, "wb") as f:
-        f.write(speech)
+        f.write(audio_bytes)
     return audio_path
 
 # 🎯 Start Interview
