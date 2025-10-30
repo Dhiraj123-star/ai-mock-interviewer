@@ -29,3 +29,5 @@ __cache__/
 # CrewAI / OpenAI temp data
 *.jsonl
 *.tmp
+# audio files
+*.mp3
