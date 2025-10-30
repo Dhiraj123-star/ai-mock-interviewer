@@ -82,17 +82,33 @@ def ask_interviewer(question, topic, exp_level):
         f"The candidate is {exp_level.lower()} level and is interviewing for {topic}.\n"
         f"They asked a clarification question:\n\n"
         f"Candidate Question: {question}\n\n"
-        "Please provide a clear, helpful explanation that:\n"
-        "- Is easy to understand\n"
-        "- Avoids complex jargon\n"
-        "- Uses a real-life analogy where relevant\n"
-        "Keep tone friendly and encouraging."
+        "Please provide a clear, helpful explanation with a real-life example."
     )
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
     )
     return response.choices[0].message.content.strip()
+
+# 🎙️ NEW — Voice Input (Speech → Text)
+def transcribe_voice(audio_file):
+    transcription = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=audio_file,
+    )
+    return transcription.text
+
+# 🔊 NEW — Voice Output (Text → Speech)
+def speak_text(text):
+    speech = client.audio.speech.create(
+        model="gpt-4o-mini-tts",
+        voice="alloy",
+        input=text
+    )
+    audio_path = "feedback_output.mp3"
+    with open(audio_path, "wb") as f:
+        f.write(speech)
+    return audio_path
 
 # 🎯 Start Interview
 if st.button("🚀 Start Personalized Interview"):
@@ -117,24 +133,38 @@ if st.session_state.current_question and not st.session_state.interview_over:
     st.subheader(f"Question {st.session_state.question_count}")
     st.markdown(f"**{st.session_state.current_question}**")
 
+    # Text Answer
     answer = st.text_area("💬 Your Answer:", key=f"answer_{st.session_state.question_count}")
 
+    # 🎙️ Voice Answer Input
+    st.markdown("🎙️ Or answer using your voice:")
+    audio_input = st.audio_input("Record your answer:")
+
     if st.button("Submit Answer"):
+        if audio_input is not None:
+            answer = transcribe_voice(audio_input)
+            st.success(f"🗣️ Transcribed Answer: {answer}")
+
         if answer.strip():
             feedback = evaluate_answer(st.session_state.current_question, answer, experience_level)
 
+            st.markdown("### 🧠 Interviewer Feedback")
+            st.write(feedback)
+
+            # 🔊 Speak Feedback
+            audio_path = speak_text(feedback)
+            st.audio(audio_path, format="audio/mp3")
+
+            # Save transcript
             st.session_state.transcript += (
                 f"Question {st.session_state.question_count}: {st.session_state.current_question}\n\n"
                 f"Answer: {answer}\n\n"
                 f"Feedback:\n{feedback}\n\n---\n\n"
             )
 
-            st.markdown("### 🧠 Interviewer Feedback")
-            st.write(feedback)
-
             st.session_state.answer_submitted = True
 
-# 🆕 Always visible follow-up question section AFTER feedback
+# 🆕 Follow-up question section
 if st.session_state.answer_submitted and not st.session_state.interview_over:
     st.markdown("---")
     st.subheader("❓ Ask the Interviewer a Clarifying Question")
@@ -143,8 +173,7 @@ if st.session_state.answer_submitted and not st.session_state.interview_over:
 
     if st.button("Ask Interviewer"):
         if follow_up.strip():
-            with st.spinner("Interviewer responding..."):
-                interviewer_reply = ask_interviewer(follow_up, topic, experience_level)
+            interviewer_reply = ask_interviewer(follow_up, topic, experience_level)
             st.markdown("### 🗨️ Interviewer's Reply")
             st.write(interviewer_reply)
 
@@ -152,8 +181,6 @@ if st.session_state.answer_submitted and not st.session_state.interview_over:
                 f"Candidate Follow-up Question:\n{follow_up}\n\n"
                 f"Interviewer Response:\n{interviewer_reply}\n\n---\n\n"
             )
-        else:
-            st.warning("⚠️ Please enter a question before submitting.")
 
     if st.button("Next Question ➡️"):
         st.session_state.answer_submitted = False
