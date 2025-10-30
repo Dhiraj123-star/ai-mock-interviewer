@@ -1,26 +1,43 @@
+
 # 🤖 AI Mock Interviewer
 
 A lightweight **AI-powered mock interviewer** built using **OpenAI** and **Streamlit**.
-It conducts **personalized, interactive interviews** based on **topic**, **difficulty level**, and **experience**, asking questions **one at a time**, evaluating your response, and now also:
+It conducts **personalized interviews** based on topic, difficulty, and experience — asking **one question at a time**, evaluating your answer, and helping you improve with clear, structured feedback.
 
-✅ Shows the **correct / ideal answer**
-✅ Explains using **real-life analogies**
-✅ Allows the **candidate to ask follow-up questions** to the interviewer
+Now includes:
+
+✅ **Correct/Ideal Answers**
+✅ **Real-Life Analogies**
+✅ **Candidate Follow-Up Questions**
+🎙️ **Voice Answer Input (Speech → Text)**
+🔊 **AI Spoken Feedback (Text → Speech)**
 
 ---
 
-## 🚀 Features
+## 🚀 Features Overview
 
-| Feature                               | Description                                      |
-| ------------------------------------- | ------------------------------------------------ |
-| 🎙️ **Live Interactive Interview**    | One question at a time, like a real interview    |
-| 🎯 **Personalized Questioning**       | Tailored by topic, difficulty & experience level |
-| 🧠 **Detailed Answer Evaluation**     | Strengths, weaknesses & score out of 10          |
-| ✅ **Correct / Ideal Answer Provided** | Teaches the proper response                      |
-| 🌱 **Analogy-Based Explanation**      | Makes complex concepts easy to understand        |
-| ❓ **Candidate Follow-up Questions**   | Ask the interviewer for clarification anytime    |
-| 🖥️ **Streamlit Front-End**           | Smooth, simple, and responsive UI                |
-| 📜 **Downloadable Transcript**        | Full Q&A + Feedback saved for review             |
+| Feature                     | Description                                           |
+| --------------------------- | ----------------------------------------------------- |
+| 💬 Live Q&A Interview       | One question at a time, like a real job interview     |
+| 🎯 Personalized Questioning | Based on topic, experience, and difficulty level      |
+| 🧠 Smart Evaluation         | Highlights strengths, weaknesses, and gives a score   |
+| ✅ Ideal Answer Provided     | Learn how you *should* answer in real interviews      |
+| 🌱 Real-Life Analogy        | Simplifies difficult concepts using everyday examples |
+| ❓ Ask Follow-Up Questions   | Candidate can ask interviewer for clarification       |
+| 🎙️ **Speech Input**        | Answer using your **voice**, powered by **Whisper**   |
+| 🔊 **Speech Output**        | Interviewer feedback is spoken aloud using **TTS**    |
+| 📥 Transcript Download      | Save the entire interview for later review            |
+
+---
+
+## 🎙️ Voice Features (New)
+
+| Feature           | Description                                 | Model Used        |
+| ----------------- | ------------------------------------------- | ----------------- |
+| **Speech → Text** | Converts your recorded voice answer to text | `whisper-1`       |
+| **Text → Speech** | AI reads feedback aloud in natural voice    | `gpt-4o-mini-tts` |
+
+This allows a **hands-free interview experience** — speak answers and listen to feedback like a real conversation.
 
 ---
 
@@ -32,13 +49,13 @@ It conducts **personalized, interactive interviews** based on **topic**, **diffi
    pip install -r requirements.txt
    ```
 
-2. **Add your OpenAI API key** to `.env`
+2. **Add your OpenAI API Key** in `.env`
 
    ```bash
    OPENAI_API_KEY=your_openai_api_key
    ```
 
-3. **Run the Streamlit app**
+3. **Run the application**
 
    ```bash
    streamlit run main.py
@@ -46,54 +63,57 @@ It conducts **personalized, interactive interviews** based on **topic**, **diffi
 
 ---
 
-## 🧩 Core Flow
+## 🧩 Interview Flow
 
-1. User selects:
+1. Choose:
 
-   * 🎯 Topic
-   * 🔥 Difficulty level
-   * 👨‍💻 Experience level
-   * #️⃣ Number of interview questions
+   * Topic
+   * Difficulty level
+   * Experience level
+   * Number of questions
 
-2. AI asks the first question.
+2. AI interviewer asks a question
 
-3. User responds.
+3. You reply:
 
-4. AI provides:
+   * 📝 by typing **or**
+   * 🎙️ by recording your voice
 
-   * 🧠 Feedback (Strengths / Improvements / Score)
-   * ✅ Correct answer explained simply
-   * 🌱 Real-life analogy for understanding
+4. AI evaluates and responds with:
 
-5. User may optionally ask a **follow-up question** for clarification.
+   * 🧠 Feedback
+   * ✅ Ideal Answer
+   * 🌱 Analogy
+   * 🔊 Spoken audio feedback
 
-6. The interview continues question-by-question until completed.
+5. You can ask follow-up questions
 
-7. User can **download the full transcript**.
+6. Continue until interview completes
+
+7. Download full transcript
 
 ---
 
-## 🧠 Example Interaction
+## 🧠 Sample Interaction
 
 ```
-Question: What is a Python decorator?
+Question: What is Dependency Injection?
 
-Your Answer: ...
-  
+Your Answer: (spoken or typed)
+
 🧠 Feedback:
-- Good understanding of function behavior
-- Missed explanation of wrapper functions
-- Score: 7/10
+- Good start explaining the concept.
+- Missing mention of inversion of control.
+- Score: 6/10
 
 ✅ Ideal Answer:
-A decorator modifies another function's behavior without changing its code...
+Dependency Injection is a design pattern where objects receive their dependencies externally...
 
-🌱 Real-Life Analogy:
-Think of wrapping a gift: the inside item stays the same, but the packaging adds something new.
+🌱 Analogy:
+Think of plugging a charger into a phone — the phone doesn't create electricity...
 
-❓ Follow-up Question:
-"What happens to the original function metadata?"
-→ AI explains clearly.
+🔊 Spoken Feedback:
+AI reads the above aloud.
 ```
 
 ---
@@ -103,4 +123,3 @@ Think of wrapping a gift: the inside item stays the same, but the packaging adds
 MIT License
 
 ---
-
