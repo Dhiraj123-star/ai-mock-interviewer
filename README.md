@@ -2,119 +2,127 @@
 # 🤖 AI Mock Interviewer
 
 A lightweight **AI-powered mock interviewer** built using **OpenAI** and **Streamlit**.
-It conducts **personalized interviews** based on topic, difficulty, and experience — asking **one question at a time**, evaluating your answer, and helping you improve with clear, structured feedback.
+It conducts **personalized interviews** based on topic, difficulty, and experience — asking **one question at a time**, evaluating your answers, and helping you improve with clear, structured feedback.
 
 Now includes:
 
-✅ **Correct/Ideal Answers**
-✅ **Real-Life Analogies**
+✅ **Correct / Ideal Answers**
+✅ **Real-Life Analogies for Understanding**
 ✅ **Candidate Follow-Up Questions**
-🎙️ **Voice Answer Input (Speech → Text)**
+🎙️ **Voice Input (Speech → Text)**
 🔊 **AI Spoken Feedback (Text → Speech)**
+🐳 **Docker Support**
+🚀 **CI/CD Deployment to Docker Hub**
 
 ---
 
-## 🚀 Features Overview
+## 🚀 Feature Overview
 
-| Feature                     | Description                                           |
-| --------------------------- | ----------------------------------------------------- |
-| 💬 Live Q&A Interview       | One question at a time, like a real job interview     |
-| 🎯 Personalized Questioning | Based on topic, experience, and difficulty level      |
-| 🧠 Smart Evaluation         | Highlights strengths, weaknesses, and gives a score   |
-| ✅ Ideal Answer Provided     | Learn how you *should* answer in real interviews      |
-| 🌱 Real-Life Analogy        | Simplifies difficult concepts using everyday examples |
-| ❓ Ask Follow-Up Questions   | Candidate can ask interviewer for clarification       |
-| 🎙️ **Speech Input**        | Answer using your **voice**, powered by **Whisper**   |
-| 🔊 **Speech Output**        | Interviewer feedback is spoken aloud using **TTS**    |
-| 📥 Transcript Download      | Save the entire interview for later review            |
+| Feature                       | Description                                        |
+| ----------------------------- | -------------------------------------------------- |
+| 💬 Live Q&A Interview         | One realistic interview question at a time         |
+| 🎯 Personalized Questioning   | Tailored by topic, difficulty & experience         |
+| 🧠 Smart Evaluation           | Strengths, weaknesses, and scoring                 |
+| ✅ Ideal Answer Provided       | Teaches how to respond correctly                   |
+| 🌱 Real-Life Analogies        | Explains complex topics simply                     |
+| ❓ Follow-Up Questions Allowed | Candidate can ask the interviewer                  |
+| 🎙️ Voice Answer Input        | Use your microphone to answer using **Whisper**    |
+| 🔊 Spoken AI Feedback         | AI speaks responses via **Text-to-Speech**         |
+| 📥 Transcript Download        | Save full interview for review                     |
+| 🐳 Docker Support             | Containerized and ready for deployment             |
+| 🚀 CI/CD Auto Deploy          | Auto-build & push to Docker Hub via GitHub Actions |
 
 ---
 
 ## 🎙️ Voice Features (New)
 
-| Feature           | Description                                 | Model Used        |
-| ----------------- | ------------------------------------------- | ----------------- |
-| **Speech → Text** | Converts your recorded voice answer to text | `whisper-1`       |
-| **Text → Speech** | AI reads feedback aloud in natural voice    | `gpt-4o-mini-tts` |
-
-This allows a **hands-free interview experience** — speak answers and listen to feedback like a real conversation.
+| Feature           | Description                        | Model Used                |
+| ----------------- | ---------------------------------- | ------------------------- |
+| **Speech → Text** | Convert your spoken answer to text | `whisper-1`               |
+| **Text → Speech** | AI speaks feedback naturally       | `gpt-4o-mini-tts` (voice) |
 
 ---
 
-## ⚙️ Setup
+## ⚙️ Local Setup
 
-1. **Install dependencies**
+```bash
+pip install -r requirements.txt
+streamlit run main.py
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+Add your **API key** inside `.env`:
 
-2. **Add your OpenAI API Key** in `.env`
+```
+OPENAI_API_KEY=your_api_key_here
+```
 
-   ```bash
-   OPENAI_API_KEY=your_openai_api_key
-   ```
+---
 
-3. **Run the application**
+## 🐳 Docker Setup
 
-   ```bash
-   streamlit run main.py
-   ```
+### **Build the Image**
+
+```bash
+docker build -t ai-mock-interviewer .
+```
+
+### **Run the Container**
+
+```bash
+docker run -p 8501:8501 ai-mock-interviewer
+```
+
+---
+
+## 🐳 docker-compose (Recommended)
+
+```bash
+docker-compose up --build
+```
+
+This automatically builds and serves the app at:
+
+```
+http://localhost:8501
+```
+
+---
+
+## 🚀 CI/CD (Auto-Deploy to Docker Hub)
+
+This project includes a **GitHub Actions Pipeline** that:
+
+1. Builds the Docker image
+2. Tags it as `latest`
+3. Pushes it to **Docker Hub**
+4. Runs on every push to `main`
+
+Add the following secrets in your repo:
+
+| Secret Name          | Value                    |
+| -------------------- | ------------------------ |
+| `DOCKERHUB_USERNAME` | Your Docker Hub Username |
+| `DOCKERHUB_TOKEN`    | Docker Hub Access Token  |
+
+Pipeline file:
+`.github/workflows/docker-publish.yml`
 
 ---
 
 ## 🧩 Interview Flow
 
-1. Choose:
-
-   * Topic
-   * Difficulty level
-   * Experience level
-   * Number of questions
-
+1. Select **topic**, **difficulty**, **experience**, and **question count**
 2. AI interviewer asks a question
-
-3. You reply:
-
-   * 📝 by typing **or**
-   * 🎙️ by recording your voice
-
-4. AI evaluates and responds with:
+3. Answer via **typing or speaking**
+4. AI gives:
 
    * 🧠 Feedback
    * ✅ Ideal Answer
    * 🌱 Analogy
-   * 🔊 Spoken audio feedback
-
-5. You can ask follow-up questions
-
-6. Continue until interview completes
-
-7. Download full transcript
-
----
-
-## 🧠 Sample Interaction
-
-```
-Question: What is Dependency Injection?
-
-Your Answer: (spoken or typed)
-
-🧠 Feedback:
-- Good start explaining the concept.
-- Missing mention of inversion of control.
-- Score: 6/10
-
-✅ Ideal Answer:
-Dependency Injection is a design pattern where objects receive their dependencies externally...
-
-🌱 Analogy:
-Think of plugging a charger into a phone — the phone doesn't create electricity...
-
-🔊 Spoken Feedback:
-AI reads the above aloud.
-```
+   * 🔊 Spoken Feedback
+5. Optionally ask a follow-up question
+6. Continue until completed
+7. Download transcript
 
 ---
 
