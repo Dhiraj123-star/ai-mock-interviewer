@@ -1,0 +1,12 @@
+
+services:
+  ai-mock-interviewer:
+    build: .
+    container_name: ai-mock-interviewer
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    restart: unless-stopped
